@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 import threading
-from utilities import run_rainbow_circle, pulse_direction, clear
+# from utilities import run_rainbow_circle, pulse_direction, solid, clear
+import re
 
 app = FastAPI()
 
@@ -29,6 +30,25 @@ async def api_clear():
     """Clears the strip."""
     clear()
     return JSONResponse(content={"message": "Clearing."})
+
+
+@app.post("/api/solid")
+async def api_solid(request: Request):
+    """Sets the LED strip to a solid color.
+
+    Expects a JSON body with a 'color' key and a valid hex code.
+    """
+    body = await request.json()
+    color = body.get("color")
+
+    if color is None:
+        raise HTTPException(status_code=400, detail="Missing 'color' key.")
+
+    if not re.match(r"^#[0-9A-Fa-f]{6}$", color):
+        raise HTTPException(status_code=400, detail="Invalid hex color code.")
+
+    threading.Thread(target=solid(color)).start()
+    return JSONResponse(content={"message": "Solid color set."})
 
 
 if __name__ == "__main__":

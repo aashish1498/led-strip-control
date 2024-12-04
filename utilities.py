@@ -20,6 +20,12 @@ def rainbow_fade_out():
     clear()
 
 
+def solid(hex_code: str):
+    (r, g, b) = hex_to_rgb(hex_code)
+    for led in range(0, NUM_LEDS_TOTAL):
+        strip.set_pixel(led, r, g, b, GLOBAL_BRIGHTNESS)
+
+
 def pulse_direction(direction: int, num_pulses: int = 1):
     if direction < 0 or direction > 3:
         raise ValueError("Direction must be between 0 and 3.")
@@ -49,3 +55,7 @@ def clear():
     if my_cycle is not None:
         my_cycle.stop()
     strip.clear_strip()
+
+
+def hex_to_rgb(hex_code: str) -> tuple[int, int, int]:
+    return tuple(int(hex_code[i : i + 2], 16) for i in (0, 2, 4))

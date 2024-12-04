@@ -76,6 +76,23 @@
                     }
                 }
             }
+        },
+        "/api/solid": {
+            "post": {
+                "summary": "Api Solid",
+                "description": "Sets the LED strip to a solid color.\n\nExpects a JSON body with a 'color' key and a valid hex code.",
+                "operationId": "api_solid_api_solid_post",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
