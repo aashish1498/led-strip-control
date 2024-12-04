@@ -24,6 +24,7 @@ def solid(hex_code: str):
     (r, g, b) = hex_to_rgb(hex_code)
     for led in range(0, NUM_LEDS_TOTAL):
         strip.set_pixel(led, r, g, b, GLOBAL_BRIGHTNESS)
+    strip.show()
 
 
 def pulse_direction(direction: int, num_pulses: int = 1):

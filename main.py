@@ -1,7 +1,8 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 import threading
-# from utilities import run_rainbow_circle, pulse_direction, solid, clear
+from config import SERVICE_PORT
+from utilities import run_rainbow_circle, pulse_direction, solid, clear
 import re
 
 app = FastAPI()
@@ -54,4 +55,4 @@ async def api_solid(request: Request):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=3001)
+    uvicorn.run(app, host="0.0.0.0", port=SERVICE_PORT)
