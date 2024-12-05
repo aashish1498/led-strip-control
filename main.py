@@ -40,7 +40,7 @@ async def api_solid(request: Request):
     Expects a JSON body with a 'color' key and a valid hex code (without hash).
     """
 
-    body = retrieve_valid_body(request, ["color"])
+    body = await retrieve_valid_body(request, ["color"])
 
     color = body.get("color")
     if not re.match(r"^[0-9A-Fa-f]{6}$", color):
