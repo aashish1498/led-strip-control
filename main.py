@@ -39,7 +39,7 @@ async def api_solid(request: Request):
 
     Expects a JSON body with a 'color' key and a valid hex code (without hash).
     """
-        
+
     body = await request.json()
     validate_body(body, ["color"])
 
@@ -52,13 +52,14 @@ async def api_solid(request: Request):
 
 
 def validate_body(body: dict, required_keys: list) -> None:
-     """Validate the JSON body of a request."""
-     if body is None or not isinstance(body, dict):
+    """Validate the JSON body of a request."""
+    if body is None or not isinstance(body, dict):
         raise HTTPException(status_code=400, detail="Invalid JSON body.")
 
-     for key in required_keys:
+    for key in required_keys:
         if key not in body:
             raise HTTPException(status_code=400, detail=f"Missing '{key}' key.")
+
 
 if __name__ == "__main__":
     import uvicorn
