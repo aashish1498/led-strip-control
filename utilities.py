@@ -1,6 +1,7 @@
 from apa102_pi.driver import apa102
 import time
 from config import NUM_LEDS_TOTAL, CORNER_LED_POSITIONS, GLOBAL_BRIGHTNESS
+import logging
 
 strip = apa102.APA102(num_led=NUM_LEDS_TOTAL, order="rgb")
 my_cycle = None
@@ -22,6 +23,7 @@ def rainbow_fade_out():
 
 def solid(hex_code: str):
     (r, g, b) = hex_to_rgb(hex_code)
+    logging.debug(f"Setting solid color to: {r}, {g}, {b} (from hex: {hex_code})")
     for led in range(0, NUM_LEDS_TOTAL):
         strip.set_pixel(led, r, g, b, GLOBAL_BRIGHTNESS)
     strip.show()
