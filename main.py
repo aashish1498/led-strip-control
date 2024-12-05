@@ -53,6 +53,9 @@ async def api_solid(request: Request):
 
 def validate_body(body: dict, required_keys: list) -> None:
      """Validate the JSON body of a request."""
+     if body is None or not isinstance(body, dict):
+        raise HTTPException(status_code=400, detail="Invalid JSON body.")
+
      for key in required_keys:
         if key not in body:
             raise HTTPException(status_code=400, detail=f"Missing '{key}' key.")
