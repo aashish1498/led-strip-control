@@ -37,20 +37,25 @@ async def api_clear():
 async def api_solid(request: Request):
     """Sets the LED strip to a solid color.
 
-    Expects a JSON body with a 'color' key and a valid hex code.
+    Expects a JSON body with a 'color' key and a valid hex code (without hash).
     """
+        
     body = await request.json()
+    validate_body(body, ["color"])
+
     color = body.get("color")
-
-    if color is None:
-        raise HTTPException(status_code=400, detail="Missing 'color' key.")
-
-    if not re.match(r"^#[0-9A-Fa-f]{6}$", color):
-        raise HTTPException(status_code=400, detail="Invalid hex color code.")
+    if not re.match(r"^[0-9A-Fa-f]{6}$", color):
+        raise HTTPException(status_code=400, detail="Invalid hex color code. Example: F5A9B8")
 
     threading.Thread(target=solid(color)).start()
     return JSONResponse(content={"message": "Solid color set."})
 
+
+def validate_body(body: dict, required_keys: list) -> None:
+     """Validate the JSON body of a request."""
+     for key in required_keys:
+        if key not in body:
+            raise HTTPException(status_code=400, detail=f"Missing '{key}' key.")
 
 if __name__ == "__main__":
     import uvicorn
