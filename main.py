@@ -40,8 +40,7 @@ async def api_solid(request: Request):
     Expects a JSON body with a 'color' key and a valid hex code (without hash).
     """
 
-    body = await request.json()
-    validate_body(body, ["color"])
+    body = retrieve_valid_body(request, ["color"])
 
     color = body.get("color")
     if not re.match(r"^[0-9A-Fa-f]{6}$", color):
@@ -51,14 +50,17 @@ async def api_solid(request: Request):
     return JSONResponse(content={"message": "Solid color set."})
 
 
-def validate_body(body: dict, required_keys: list) -> None:
-    """Validate the JSON body of a request."""
-    if body is None or not isinstance(body, dict):
+async def retrieve_valid_body(request: Request, required_keys: list) -> dict:
+    """Validates and retrieves the JSON body of a request."""
+    body = None
+    try:
+        body = await request.json()
+        for key in required_keys:
+            if key not in body:
+                raise HTTPException(status_code=400, detail=f"Missing '{key}' key.")
+    except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid JSON body.")
-
-    for key in required_keys:
-        if key not in body:
-            raise HTTPException(status_code=400, detail=f"Missing '{key}' key.")
+    return body
 
 
 if __name__ == "__main__":
