@@ -69,7 +69,7 @@ def set_circular_pixels(
             time.sleep(pause_seconds)
 
 
-def set_percentage(percentage: float):
+def set_percentage(percentage: float, flash: bool):
     if percentage < 0 or percentage > 100:
         raise ValueError("Percentage must be between 0 and 100.")
 
@@ -77,3 +77,25 @@ def set_percentage(percentage: float):
     set_circular_pixels(
         GLOBAL_BRIGHTNESS, 0.005, color_selector=red_amber_green_from_index, num_leds_to_light=leds_to_light
     )
+
+    buffer = 8
+    if flash and leds_to_light > buffer:
+        for _ in range(3):
+            time.sleep(0.3)
+            for i in range(leds_to_light, leds_to_light - buffer, -1):
+                set_pixel_brightness(i, 0)
+            strip.show()
+            time.sleep(0.3)
+            for i in range(leds_to_light, leds_to_light - buffer, -1):
+                set_pixel_brightness(i, GLOBAL_BRIGHTNESS)
+            strip.show()
+        set_circular_pixels(
+            brightness=0,
+            pause_seconds=0.005,
+            color_selector=red_amber_green_from_index,
+            num_leds_to_light=leds_to_light,
+        )
+
+
+def set_pixel_brightness(led_num: int, brightness: int):
+    strip.set_pixel_rgb(led_num, strip.get_pixel_rgb(led_num)["rgb_color"], brightness)

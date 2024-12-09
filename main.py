@@ -48,7 +48,7 @@ async def api_solid(request: SolidRequest):
 @app.post("/api/percentage")
 async def api_circle(request: PercentageRequest):
     """Set the LED to a red-amber-green based percentage."""
-    threading.Thread(target=set_percentage(request.percentage)).start()
+    threading.Thread(target=set_percentage(request.percentage, request.flashing)).start()
     return JSONResponse(content={"message": "Percentage started effect started."})
 
 
