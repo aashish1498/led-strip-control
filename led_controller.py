@@ -3,7 +3,7 @@ import time
 from config import NUM_LEDS_TOTAL, CORNER_LED_POSITIONS, GLOBAL_BRIGHTNESS
 import logging
 
-from utilities.led_utils import hex_to_rgb, rainbow_colour_from_index
+from utilities.led_utils import hex_to_rgb, rainbow_colour_from_index, red_amber_green_from_index
 
 strip = apa102.APA102(num_led=NUM_LEDS_TOTAL, order="rgb")
 my_cycle = None
@@ -17,9 +17,7 @@ def clear():
 
 
 def run_rainbow_circle():
-    set_circular_pixels(
-        GLOBAL_BRIGHTNESS, 0.005, color_selector=rainbow_colour_from_index
-    )
+    set_circular_pixels(GLOBAL_BRIGHTNESS, 0.005, color_selector=rainbow_colour_from_index)
     time.sleep(2)
     rainbow_fade_out()
 
@@ -71,19 +69,11 @@ def set_circular_pixels(
             time.sleep(pause_seconds)
 
 
-def set_percentage(percentage: float, flash: bool):
+def set_percentage(percentage: float):
     if percentage < 0 or percentage > 100:
         raise ValueError("Percentage must be between 0 and 100.")
 
-    num_leds_to_light = int((percentage / 100) * NUM_LEDS_TOTAL)
-    logging.debug(f"Setting {num_leds_to_light} LEDs to full brightness.")
-
-    for i in range(num_leds_to_light):
-        strip.set_pixel(i, 156, 255, 250, GLOBAL_BRIGHTNESS)
-
-    if flash:
-        strip.show
-        time.sleep(0.1)
-        strip.clear_strip
-    else:
-        strip.show
+    leds_to_light = int(NUM_LEDS_TOTAL * (percentage / 100))
+    set_circular_pixels(
+        GLOBAL_BRIGHTNESS, 0.005, color_selector=red_amber_green_from_index, num_leds_to_light=leds_to_light
+    )

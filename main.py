@@ -1,9 +1,10 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 import threading
 from config import SERVICE_PORT
 import re
-from led_controller import clear, pulse_direction, run_rainbow_circle, solid
+from led_controller import clear, pulse_direction, run_rainbow_circle, set_percentage, solid
+from utilities.request_types import PercentageRequest, SolidRequest
 
 app = FastAPI()
 
@@ -34,33 +35,21 @@ async def api_clear():
 
 
 @app.post("/api/solid")
-async def api_solid(request: Request):
-    """Sets the LED strip to a solid color.
+async def api_solid(request: SolidRequest):
+    """Sets the LED strip to a solid colour."""
+    hex_code = request.hex_code
+    if not re.match(r"^[0-9A-Fa-f]{6}$", hex_code):
+        raise HTTPException(status_code=400, detail="Invalid hex colour code. Example: F5A9B8")
 
-    Expects a JSON body with a 'color' key and a valid hex code (without hash).
-    """
-
-    body = await retrieve_valid_body(request, ["color"])
-
-    color = body.get("color")
-    if not re.match(r"^[0-9A-Fa-f]{6}$", color):
-        raise HTTPException(status_code=400, detail="Invalid hex color code. Example: F5A9B8")
-
-    threading.Thread(target=solid(color)).start()
-    return JSONResponse(content={"message": "Solid color set."})
+    threading.Thread(target=solid(hex_code)).start()
+    return JSONResponse(content={"message": "Solid colour set."})
 
 
-async def retrieve_valid_body(request: Request, required_keys: list) -> dict:
-    """Validates and retrieves the JSON body of a request."""
-    body = None
-    try:
-        body = await request.json()
-        for key in required_keys:
-            if key not in body:
-                raise HTTPException(status_code=400, detail=f"Missing '{key}' key.")
-    except Exception as e:
-        raise HTTPException(status_code=400, detail="Invalid JSON body.")
-    return body
+@app.post("/api/percentage")
+async def api_circle(request: PercentageRequest):
+    """Set the LED to a red-amber-green based percentage."""
+    threading.Thread(target=set_percentage(request.percentage)).start()
+    return JSONResponse(content={"message": "Percentage started effect started."})
 
 
 if __name__ == "__main__":
