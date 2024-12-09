@@ -2,8 +2,8 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 import threading
 from config import SERVICE_PORT
-from utilities import run_rainbow_circle, pulse_direction, solid, clear
 import re
+from led_controller import clear, pulse_direction, run_rainbow_circle, solid
 
 app = FastAPI()
 
