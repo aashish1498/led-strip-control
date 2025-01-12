@@ -1,11 +1,9 @@
-import asyncio
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
-import threading
-from app_state import AppState, Status
+from app_state import AppState
 from config import SERVICE_PORT
 import re
-from led_controller import LedController, clear, flash_direction, pulse, run_rainbow_circle, set_percentage, solid
+from led_controller import LedController
 from utilities.request_types import PercentageRequest, PulseRequest, SolidRequest
 
 app = FastAPI()

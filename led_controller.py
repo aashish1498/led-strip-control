@@ -15,18 +15,18 @@ class LedController():
     def __init__(self):
         self.status = Status.RUNNING
         
-    def clear(self, ):
+    def clear(self):
         self.strip.clear_strip()
         self.status = Status.CLEARED
 
 
-    def run_rainbow_circle(self, ):
+    def run_rainbow_circle(self):
         self.set_circular_pixels(GLOBAL_BRIGHTNESS, 0.005, color_selector=rainbow_colour_from_index)
         time.sleep(2)
         self.rainbow_fade_out()
 
 
-    def rainbow_fade_out(self, ):
+    def rainbow_fade_out(self):
         for brightness in range(GLOBAL_BRIGHTNESS, 0, -1):
             self.set_circular_pixels(brightness, 0, color_selector=rainbow_colour_from_index)
             self.strip.show()
@@ -66,7 +66,8 @@ class LedController():
                 asyncio.sleep(pause_time_seconds)
 
 
-    def set_circular_pixels(self, 
+    def set_circular_pixels(
+        self,
         brightness: int = GLOBAL_BRIGHTNESS,
         pause_seconds: float = 0,
         color_selector=rainbow_colour_from_index,
