@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from app_state import AppState, Status
@@ -35,14 +36,18 @@ async def api_pulse(request: PulseRequest):
     cleaned_colors = []
     for color in request.colours:
         cleaned_colors.append(clean_and_validate_hex(color))
+
+    async def pulse():
+        asyncio.create_task(controller.pulse(cleaned_colors, request.pause_time_seconds))
     
-    await controller.pulse(cleaned_colors, request.pause_time_seconds)
+    asyncio.get_event_loop().run_forever(pulse())
     return JSONResponse(content={"message": "Pulsing."})
 
 
 @app.get("/api/clear")
 async def api_clear():
     """Clears the strip."""
+    asyncio.get_event_loop().stop()
     controller.status = Status.CLEARED
     controller.clear()
     return JSONResponse(content={"message": "Clearing."})
