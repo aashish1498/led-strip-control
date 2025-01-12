@@ -4,7 +4,7 @@ import threading
 from config import SERVICE_PORT
 import re
 from led_controller import clear, flash_direction, pulse, run_rainbow_circle, set_percentage, solid
-from utilities.request_types import FlashRequest, PercentageRequest, PulseRequest, SolidRequest
+from utilities.request_types import PercentageRequest, PulseRequest, SolidRequest
 
 app = FastAPI()
 
@@ -17,13 +17,13 @@ async def api_circle():
 
 
 @app.get("/api/flash-direction")
-async def api_flash(request: FlashRequest):
+async def api_flash(direction: int, number_of_flashes: int):
     """Flashes the LED strip in a given direction.
 
     Args:
         direction (int): 0: bottom, 1: left, 2: top, 3: right
     """
-    threading.Thread(target=flash_direction(request.direction, request.number_of_flashes)).start()
+    threading.Thread(target=flash_direction(direction, number_of_flashes)).start()
     return JSONResponse(content={"message": "Flashing."})
 
 
