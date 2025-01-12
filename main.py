@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
-from app_state import AppState
+from app_state import AppState, Status
 from config import SERVICE_PORT
 import re
 from led_controller import LedController
@@ -43,7 +43,7 @@ async def api_pulse(request: PulseRequest):
 @app.get("/api/clear")
 async def api_clear():
     """Clears the strip."""
-    controller.status = status.CLEARED
+    controller.status = Status.CLEARED
     controller.clear()
     return JSONResponse(content={"message": "Clearing."})
 
