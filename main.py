@@ -1,13 +1,14 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 import threading
+from app_state import AppState, Status
 from config import SERVICE_PORT
 import re
 from led_controller import clear, flash_direction, pulse, run_rainbow_circle, set_percentage, solid
 from utilities.request_types import PercentageRequest, PulseRequest, SolidRequest
 
 app = FastAPI()
-
+state = AppState()
 
 @app.get("/api/circle")
 async def api_circle():
@@ -42,6 +43,7 @@ async def api_pulse(request: PulseRequest):
 @app.get("/api/clear")
 async def api_clear():
     """Clears the strip."""
+    state.set_status(Status.CLEARED)
     clear()
     return JSONResponse(content={"message": "Clearing."})
 
