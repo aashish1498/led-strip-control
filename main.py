@@ -5,16 +5,17 @@ import threading
 from app_state import AppState, Status
 from config import SERVICE_PORT
 import re
-from led_controller import clear, flash_direction, pulse, run_rainbow_circle, set_percentage, solid
+from led_controller import LedController, clear, flash_direction, pulse, run_rainbow_circle, set_percentage, solid
 from utilities.request_types import PercentageRequest, PulseRequest, SolidRequest
 
 app = FastAPI()
 state = AppState()
+controller = LedController()
 
 @app.get("/api/circle")
 async def api_circle():
     """Trigger the rainbow circle."""
-    threading.Thread(target=run_rainbow_circle).start()
+    controller.run_rainbow_circle()
     return JSONResponse(content={"message": "Circle effect started."})
 
 
@@ -25,7 +26,7 @@ async def api_flash(direction: int, number_of_flashes: int):
     Args:
         direction (int): 0: bottom, 1: left, 2: top, 3: right
     """
-    threading.Thread(target=flash_direction(direction, number_of_flashes)).start()
+    controller.flash_direction(direction, number_of_flashes)
     return JSONResponse(content={"message": "Flashing."})
 
 
@@ -36,17 +37,16 @@ async def api_pulse(request: PulseRequest):
     cleaned_colors = []
     for color in request.colours:
         cleaned_colors.append(clean_and_validate_hex(color))
-        
-    task = asyncio.create_task(pulse(cleaned_colors, request.pause_time_seconds))
-    await task
+    
+    await controller.pulse(cleaned_colors, request.pause_time_seconds)
     return JSONResponse(content={"message": "Pulsing."})
 
 
 @app.get("/api/clear")
 async def api_clear():
     """Clears the strip."""
-    state.set_status(Status.CLEARED)
-    clear()
+    controller.status = status.CLEARED
+    controller.clear()
     return JSONResponse(content={"message": "Clearing."})
 
 
@@ -54,14 +54,14 @@ async def api_clear():
 async def api_solid(request: SolidRequest):
     """Sets the LED strip to a solid colour."""
     hex_code = clean_and_validate_hex(request.hex_code)
-    threading.Thread(target=solid(hex_code)).start()
+    controller.solid(hex_code)
     return JSONResponse(content={"message": "Solid colour set."})
 
 
 @app.post("/api/percentage")
 async def api_circle(request: PercentageRequest):
     """Set the LED to a red-amber-green based percentage."""
-    threading.Thread(target=set_percentage(request.percentage, request.flashing)).start()
+    controller.set_percentage(request.percentage, request.flashing)
     return JSONResponse(content={"message": "Percentage started effect started."})
 
 
