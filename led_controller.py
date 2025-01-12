@@ -3,17 +3,20 @@ import time
 from config import NUM_LEDS_TOTAL, CORNER_LED_POSITIONS, GLOBAL_BRIGHTNESS
 import logging
 
+from app_state import AppState, Status
 from utilities.led_utils import hex_to_rgb, rainbow_colour_from_index, red_amber_green_from_index
 
 strip = apa102.APA102(num_led=NUM_LEDS_TOTAL, order="rgb")
 my_cycle = None
 scale_factor = 255 / NUM_LEDS_TOTAL
 
+state = AppState()
 
 def clear():
     if my_cycle is not None:
         my_cycle.stop()
     strip.clear_strip()
+    state.set_status(Status.CLEARED)
 
 
 def run_rainbow_circle():
@@ -38,13 +41,12 @@ def solid(hex_code: str):
     strip.show()
 
 
-def pulse_direction(direction: int, num_pulses: int = 1):
+def flash_direction(direction: int, num_flashes: int = 1):
     if direction < 0 or direction > 3:
         raise ValueError("Direction must be between 0 and 3.")
 
     buffer = 2
-
-    for _ in range(num_pulses):
+    for _ in range(num_flashes):
         for i in range(
             CORNER_LED_POSITIONS[direction] + buffer,
             CORNER_LED_POSITIONS[direction + 1] - buffer,
@@ -53,6 +55,14 @@ def pulse_direction(direction: int, num_pulses: int = 1):
         strip.show()
         time.sleep(0.1)
         strip.clear_strip()
+
+
+def pulse(colours: list[str], pause_time_seconds: str):
+    state.set_status(Status.RUNNING)
+    while state.get_status() is not Status.CLEARED:
+        for colour in colours:
+            solid(colour)
+            time.sleep(pause_time_seconds)
 
 
 def set_circular_pixels(
