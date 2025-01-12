@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 import threading
@@ -36,7 +37,7 @@ async def api_pulse(request: PulseRequest):
     for color in request.colours:
         cleaned_colors.append(clean_and_validate_hex(color))
 
-    threading.Thread(target=pulse(cleaned_colors, request.pause_time_seconds)).start()
+    threading.Thread(target=asyncio.run(pulse(cleaned_colors, request.pause_time_seconds))).start()
     return JSONResponse(content={"message": "Pulsing."})
 
 

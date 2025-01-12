@@ -2,7 +2,7 @@ from apa102_pi.driver import apa102
 import time
 from config import NUM_LEDS_TOTAL, CORNER_LED_POSITIONS, GLOBAL_BRIGHTNESS
 import logging
-
+import asyncio
 from app_state import AppState, Status
 from utilities.led_utils import hex_to_rgb, rainbow_colour_from_index, red_amber_green_from_index
 
@@ -57,12 +57,12 @@ def flash_direction(direction: int, num_flashes: int = 1):
         strip.clear_strip()
 
 
-def pulse(colours: list[str], pause_time_seconds: str):
+async def pulse(colours: list[str], pause_time_seconds: str):
     state.set_status(Status.RUNNING)
     while state.get_status() is not Status.CLEARED:
         for colour in colours:
             solid(colour)
-            time.sleep(pause_time_seconds)
+            asyncio.sleep(pause_time_seconds)
 
 
 def set_circular_pixels(
