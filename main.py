@@ -37,7 +37,7 @@ async def api_clear():
 @app.post("/api/solid")
 async def api_solid(request: SolidRequest):
     """Sets the LED strip to a solid colour."""
-    hex_code = request.hex_code
+    hex_code = request.hex_code.lstrip('#')
     if not re.match(r"^[0-9A-Fa-f]{6}$", hex_code):
         raise HTTPException(status_code=400, detail="Invalid hex colour code. Example: F5A9B8")
 
