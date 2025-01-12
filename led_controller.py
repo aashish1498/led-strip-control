@@ -63,7 +63,7 @@ class LedController():
         while self.status is not Status.CLEARED:
             for colour in colours:
                 self.solid(colour)
-                asyncio.sleep(pause_time_seconds)
+                await asyncio.sleep(pause_time_seconds)
 
 
     def set_circular_pixels(
