@@ -37,7 +37,7 @@ async def api_pulse(request: PulseRequest):
     for color in request.colours:
         cleaned_colors.append(clean_and_validate_hex(color))
 
-    threading.Thread(target=asyncio.run(pulse(cleaned_colors, request.pause_time_seconds))).start()
+    asyncio.run(pulse(cleaned_colors, request.pause_time_seconds))
     return JSONResponse(content={"message": "Pulsing."})
 
 
