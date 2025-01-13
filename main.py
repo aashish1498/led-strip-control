@@ -33,10 +33,11 @@ async def api_flash(direction: int, number_of_flashes: int):
 async def api_pulse(request: PulseRequest):
     """Pulses the LED strip between given colours.
     """
-    cleaned_colors = []
-    for color in request.colours:
-        cleaned_colors.append(clean_and_validate_hex(color))
-    threading.Thread(target=await controller.pulse(cleaned_colors, request.pause_time_seconds)).start()
+    cleaned_colors = [clean_and_validate_hex(color) for color in request.colours]
+    
+    # Create a thread to run the pulse function
+    thread = threading.Thread(target=controller.pulse, args=(cleaned_colors, request.pause_time_seconds))
+    thread.start()
     return JSONResponse(content={"message": "Pulsing."})
 
 
