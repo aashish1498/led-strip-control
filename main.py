@@ -36,7 +36,7 @@ async def api_pulse(request: PulseRequest):
     cleaned_colors = []
     for color in request.colours:
         cleaned_colors.append(clean_and_validate_hex(color))
-    threading.Thread(target=controller.pulse(cleaned_colors, request.pause_time_seconds)).start()
+    threading.Thread(target=await controller.pulse(cleaned_colors, request.pause_time_seconds)).start()
     return JSONResponse(content={"message": "Pulsing."})
 
 
