@@ -1,3 +1,4 @@
+import threading
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from app_state import AppState, Status
@@ -35,8 +36,7 @@ async def api_pulse(request: PulseRequest):
     cleaned_colors = []
     for color in request.colours:
         cleaned_colors.append(clean_and_validate_hex(color))
-    
-    controller.pulse(cleaned_colors, request.pause_time_seconds)
+    threading.Thread(target=controller.pulse(cleaned_colors, request.pause_time_seconds)).start()
     return JSONResponse(content={"message": "Pulsing."})
 
 
