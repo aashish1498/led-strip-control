@@ -12,14 +12,14 @@ state = AppState()
 controller = LedController()
 
 
-@app.get("/api/circle")
+@app.post("/api/circle")
 async def api_circle():
     """Trigger the rainbow circle."""
     controller.set_task(asyncio.ensure_future(controller.run_rainbow_circle()))
     return JSONResponse(content={"message": "Circle effect started."})
 
 
-@app.get("/api/flash-direction")
+@app.post("/api/flash-direction")
 async def api_flash(direction: int, number_of_flashes: int):
     """Flashes the LED strip in a given direction.
 
@@ -30,7 +30,7 @@ async def api_flash(direction: int, number_of_flashes: int):
     return JSONResponse(content={"message": "Flashing."})
 
 
-@app.get("/api/pulse")
+@app.post("/api/pulse")
 async def api_pulse(request: PulseRequest):
     """Pulses the LED strip between given colours."""
     controller.cancel_task()
@@ -43,7 +43,7 @@ async def api_pulse(request: PulseRequest):
     return JSONResponse(content={"message": "Pulsing."})
 
 
-@app.get("/api/clear")
+@app.post("/api/clear")
 async def api_clear():
     """Clears the strip."""
     controller.clear(True)

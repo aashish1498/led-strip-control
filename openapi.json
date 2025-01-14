@@ -3,10 +3,10 @@
     "info": { "title": "FastAPI", "version": "0.1.0" },
     "paths": {
         "/api/circle": {
-            "get": {
+            "post": {
                 "summary": "Api Circle",
                 "description": "Trigger the rainbow circle.",
-                "operationId": "api_circle_api_circle_get",
+                "operationId": "api_circle_api_circle_post",
                 "responses": {
                     "200": {
                         "description": "Successful Response",
@@ -16,10 +16,10 @@
             }
         },
         "/api/flash-direction": {
-            "get": {
+            "post": {
                 "summary": "Api Flash",
                 "description": "Flashes the LED strip in a given direction.\n\nArgs:\n    direction (int): 0: bottom, 1: left, 2: top, 3: right",
-                "operationId": "api_flash_api_flash_direction_get",
+                "operationId": "api_flash_api_flash_direction_post",
                 "parameters": [
                     {
                         "name": "direction",
@@ -56,10 +56,10 @@
             }
         },
         "/api/pulse": {
-            "get": {
+            "post": {
                 "summary": "Api Pulse",
                 "description": "Pulses the LED strip between given colours.",
-                "operationId": "api_pulse_api_pulse_get",
+                "operationId": "api_pulse_api_pulse_post",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -89,10 +89,10 @@
             }
         },
         "/api/clear": {
-            "get": {
+            "post": {
                 "summary": "Api Clear",
                 "description": "Clears the strip.",
-                "operationId": "api_clear_api_clear_get",
+                "operationId": "api_clear_api_clear_post",
                 "responses": {
                     "200": {
                         "description": "Successful Response",
