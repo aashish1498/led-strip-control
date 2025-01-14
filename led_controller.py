@@ -33,12 +33,14 @@ class LedController:
         self.clear()
 
     def clear(self, reset_status: bool = False):
+        self.status = Status.CLEARED
         self.strip.clear_strip()
         if reset_status:
             self.status = Status.CLEARED
             self.cancel_task()
 
     async def run_rainbow_circle(self):
+        self.status = Status.RUNNING
         self.set_circular_pixels(
             GLOBAL_BRIGHTNESS, 0.005, color_selector=rainbow_colour_from_index
         )
@@ -62,6 +64,7 @@ class LedController:
         self.strip.show()
 
     async def flash_direction(self, direction: int, num_flashes: int = 1):
+        self.status = Status.RUNNING
         if direction < 0 or direction > 3:
             raise ValueError("Direction must be between 0 and 3.")
         logging.debug(f"Flashing direction {direction} {num_flashes} times.")
