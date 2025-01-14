@@ -4,39 +4,44 @@ from config import NUM_LEDS_TOTAL, CORNER_LED_POSITIONS, GLOBAL_BRIGHTNESS
 import logging
 import asyncio
 from app_state import Status
-from utilities.led_utils import hex_to_rgb, rainbow_colour_from_index, red_amber_green_from_index, exponential_map
+from utilities.led_utils import (
+    hex_to_rgb,
+    rainbow_colour_from_index,
+    red_amber_green_from_index,
+    exponential_map,
+)
 
 scale_factor = 255 / NUM_LEDS_TOTAL
 sleep_step = 0.1
 
 
-
-class LedController():
+class LedController:
     strip = apa102.APA102(num_led=NUM_LEDS_TOTAL, order="rgb")
     status: Status
-    
+
     def __init__(self):
         self.status = Status.RUNNING
-        
+
     def clear(self):
         self.strip.clear_strip()
         self.status = Status.CLEARED
         time.sleep(0.5)
 
-
     async def run_rainbow_circle(self):
-        self.set_circular_pixels(GLOBAL_BRIGHTNESS, 0.005, color_selector=rainbow_colour_from_index)
+        self.set_circular_pixels(
+            GLOBAL_BRIGHTNESS, 0.005, color_selector=rainbow_colour_from_index
+        )
         await asyncio.sleep(2)
         self.rainbow_fade_out()
 
-
     async def rainbow_fade_out(self):
         for brightness in range(GLOBAL_BRIGHTNESS, 0, -1):
-            self.set_circular_pixels(brightness, 0, color_selector=rainbow_colour_from_index)
+            self.set_circular_pixels(
+                brightness, 0, color_selector=rainbow_colour_from_index
+            )
             self.strip.show()
             await asyncio.sleep(0.002)
         self.clear()
-
 
     def solid(self, hex_code: str):
         (r, g, b) = hex_to_rgb(hex_code)
@@ -44,7 +49,6 @@ class LedController():
         for led in range(0, NUM_LEDS_TOTAL):
             self.strip.set_pixel(led, r, g, b, GLOBAL_BRIGHTNESS)
         self.strip.show()
-
 
     async def flash_direction(self, direction: int, num_flashes: int = 1):
         if direction < 0 or direction > 3:
@@ -62,7 +66,6 @@ class LedController():
             self.strip.clear_strip()
             await asyncio.sleep(0.1)
 
-
     async def pulse(self, colours: list[str], pause_time_seconds: float):
         self.status = Status.RUNNING
         fade_time_seconds = pause_time_seconds * 0.8
@@ -76,25 +79,28 @@ class LedController():
                 await asyncio.sleep(static_time_seconds)
         self.clear()
 
-    async def fade_between_colors(self, color_from: str, color_to: str, duration: float):
+    async def fade_between_colors(
+        self, color_from: str, color_to: str, duration: float
+    ):
         r_from, g_from, b_from = hex_to_rgb(color_from)
         r_to, g_to, b_to = hex_to_rgb(color_to)
-        
+
         steps = int(duration * 20)
         step_duration = duration / steps
 
         for step in range(steps + 1):
-            if self.status is Status.CLEARED: return
-           
+            if self.status is Status.CLEARED:
+                return
+
             r = exponential_map(step, 0, steps, r_from, r_to)
             g = exponential_map(step, 0, steps, g_from, g_to)
             b = exponential_map(step, 0, steps, b_from, b_to)
             for led in range(NUM_LEDS_TOTAL):
                 self.strip.set_pixel(led, r, g, b, GLOBAL_BRIGHTNESS)
-            
+
             self.strip.show()
             await asyncio.sleep(step_duration)
-            
+
     async def set_circular_pixels(
         self,
         brightness: int = GLOBAL_BRIGHTNESS,
@@ -109,14 +115,16 @@ class LedController():
                 self.strip.show()
                 await asyncio.sleep(pause_seconds)
 
-
     async def set_percentage(self, percentage: float, flash: bool):
         if percentage < 0 or percentage > 100:
             raise ValueError("Percentage must be between 0 and 100.")
 
         leds_to_light = int(NUM_LEDS_TOTAL * (percentage / 100))
         self.set_circular_pixels(
-            GLOBAL_BRIGHTNESS, 0.005, color_selector=red_amber_green_from_index, num_leds_to_light=leds_to_light
+            GLOBAL_BRIGHTNESS,
+            0.005,
+            color_selector=red_amber_green_from_index,
+            num_leds_to_light=leds_to_light,
         )
 
         buffer = 8
@@ -137,10 +145,10 @@ class LedController():
                 num_leds_to_light=leds_to_light,
             )
 
-
     def set_pixel_brightness(self, led_num: int, brightness: int):
-        self.strip.set_pixel_rgb(led_num, self.strip.get_pixel_rgb(led_num)["rgb_color"], brightness)
-        
+        self.strip.set_pixel_rgb(
+            led_num, self.strip.get_pixel_rgb(led_num)["rgb_color"], brightness
+        )
 
     async def safe_sleep(self, sleep_seconds: float):
         if sleep_seconds <= sleep_step:
