@@ -24,6 +24,7 @@ class LedController:
         self.status = Status.RUNNING
 
     def set_task(self, task: asyncio.Task):
+        self.cancel_task()
         self.current_task = task
 
     def cancel_task(self):
@@ -41,7 +42,7 @@ class LedController:
         self.set_circular_pixels(
             GLOBAL_BRIGHTNESS, 0.005, color_selector=rainbow_colour_from_index
         )
-        await asyncio.sleep(2)
+        await self.safe_sleep(2)
         self.rainbow_fade_out()
 
     async def rainbow_fade_out(self):
@@ -50,7 +51,7 @@ class LedController:
                 brightness, 0, color_selector=rainbow_colour_from_index
             )
             self.strip.show()
-            await asyncio.sleep(0.002)
+            await self.safe_sleep(0.002)
         self.clear()
 
     def solid(self, hex_code: str):
@@ -72,9 +73,9 @@ class LedController:
             ):
                 self.strip.set_pixel(i, 156, 255, 250, GLOBAL_BRIGHTNESS)
             self.strip.show()
-            await asyncio.sleep(0.1)
+            await self.safe_sleep(0.1)
             self.strip.clear_strip()
-            await asyncio.sleep(0.1)
+            await self.safe_sleep(0.1)
 
     async def pulse(self, colours: list[str], pause_time_seconds: float):
         self.status = Status.RUNNING
@@ -125,7 +126,7 @@ class LedController:
             self.strip.set_pixel_rgb(i, pixel_color, brightness)
             if pause_seconds > 0:
                 self.strip.show()
-                await asyncio.sleep(pause_seconds)
+                await self.safe_sleep(pause_seconds)
 
     async def set_percentage(self, percentage: float, flash: bool):
         if percentage < 0 or percentage > 100:
@@ -142,11 +143,11 @@ class LedController:
         buffer = 8
         if flash and leds_to_light > buffer:
             for _ in range(3):
-                await asyncio.sleep(0.3)
+                await self.safe_sleep(0.3)
                 for i in range(leds_to_light, leds_to_light - buffer, -1):
                     self.set_pixel_brightness(i, 0)
                 self.strip.show()
-                await asyncio.sleep(0.3)
+                await self.safe_sleep(0.3)
                 for i in range(leds_to_light, leds_to_light - buffer, -1):
                     self.set_pixel_brightness(i, GLOBAL_BRIGHTNESS)
                 self.strip.show()

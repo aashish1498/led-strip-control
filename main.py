@@ -15,7 +15,7 @@ controller = LedController()
 @app.get("/api/circle")
 async def api_circle():
     """Trigger the rainbow circle."""
-    asyncio.create_task(controller.run_rainbow_circle())
+    controller.set_task(asyncio.ensure_future(controller.run_rainbow_circle()))
     return JSONResponse(content={"message": "Circle effect started."})
 
 
@@ -26,7 +26,7 @@ async def api_flash(direction: int, number_of_flashes: int):
     Args:
         direction (int): 0: bottom, 1: left, 2: top, 3: right
     """
-    asyncio.create_task(controller.flash_direction(direction, number_of_flashes))
+    controller.set_task(asyncio.ensure_future(controller.flash_direction(direction, number_of_flashes)))
     return JSONResponse(content={"message": "Flashing."})
 
 
@@ -61,7 +61,7 @@ async def api_solid(request: SolidRequest):
 @app.post("/api/percentage")
 async def api_circle(request: PercentageRequest):
     """Set the LED to a red-amber-green based percentage."""
-    asyncio.create_task(controller.set_percentage(request.percentage, request.flashing))
+    controller.set_task(asyncio.ensure_future(controller.set_percentage(request.percentage, request.flashing)))
     return JSONResponse(content={"message": "Percentage started effect started."})
 
 
