@@ -35,20 +35,19 @@ class LedController:
         self.status = Status.CLEARED
         self.strip.clear_strip()
         if reset_status:
-            self.status = Status.CLEARED
             self.cancel_task()
 
     async def run_rainbow_circle(self):
         self.status = Status.RUNNING
-        self.set_circular_pixels(
+        await self.set_circular_pixels(
             GLOBAL_BRIGHTNESS, 0.005, color_selector=rainbow_colour_from_index
         )
         await self.safe_sleep(2)
-        self.rainbow_fade_out()
+        await self.rainbow_fade_out()
 
     async def rainbow_fade_out(self):
         for brightness in range(GLOBAL_BRIGHTNESS, 0, -1):
-            self.set_circular_pixels(
+            await self.set_circular_pixels(
                 brightness, 0, color_selector=rainbow_colour_from_index
             )
             self.strip.show()
@@ -135,7 +134,7 @@ class LedController:
             raise ValueError("Percentage must be between 0 and 100.")
 
         leds_to_light = int(NUM_LEDS_TOTAL * (percentage / 100))
-        self.set_circular_pixels(
+        await self.set_circular_pixels(
             GLOBAL_BRIGHTNESS,
             0.005,
             color_selector=red_amber_green_from_index,
@@ -153,7 +152,7 @@ class LedController:
                 for i in range(leds_to_light, leds_to_light - buffer, -1):
                     self.set_pixel_brightness(i, GLOBAL_BRIGHTNESS)
                 self.strip.show()
-            self.set_circular_pixels(
+            await self.set_circular_pixels(
                 brightness=0,
                 pause_seconds=0.005,
                 color_selector=red_amber_green_from_index,
