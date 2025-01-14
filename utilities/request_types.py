@@ -9,6 +9,7 @@ class PercentageRequest(BaseModel):
 class SolidRequest(BaseModel):
     hex_code: str
 
+
 class PulseRequest(BaseModel):
     colours: list[str]
     pause_time_seconds: float = 1

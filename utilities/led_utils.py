@@ -23,7 +23,9 @@ def red_amber_green_from_index(index: int) -> any:
     return default_strip.combine_color(red_value, green_value, 0)
 
 
-def exponential_map(value, input_min=0, input_max=100, output_min=0, output_max=255, exponent=2) -> int:
+def exponential_map(
+    value, input_min=0, input_max=100, output_min=0, output_max=255, exponent=2
+) -> int:
     normalized = (value - input_min) / (input_max - input_min)
     exp_value = normalized**exponent
     mapped_value = output_min + (exp_value * (output_max - output_min))

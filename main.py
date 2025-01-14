@@ -12,10 +12,11 @@ app = FastAPI()
 state = AppState()
 controller = LedController()
 
+
 @app.get("/api/circle")
 async def api_circle():
     """Trigger the rainbow circle."""
-    controller.run_rainbow_circle()
+    asyncio.create_task(controller.run_rainbow_circle())
     return JSONResponse(content={"message": "Circle effect started."})
 
 
@@ -26,19 +27,16 @@ async def api_flash(direction: int, number_of_flashes: int):
     Args:
         direction (int): 0: bottom, 1: left, 2: top, 3: right
     """
-    controller.flash_direction(direction, number_of_flashes)
+    asyncio.create_task(controller.flash_direction(direction, number_of_flashes))
     return JSONResponse(content={"message": "Flashing."})
 
 
 @app.get("/api/pulse")
 async def api_pulse(request: PulseRequest):
-    """Pulses the LED strip between given colours.
-    """
+    """Pulses the LED strip between given colours."""
+    if controller.status is not Status.CLEARED:
+        controller.clear()
     cleaned_colors = [clean_and_validate_hex(color) for color in request.colours]
-    
-    # Create a thread to run the pulse function
-    # thread = threading.Thread(target=controller.pulse, args=(cleaned_colors, request.pause_time_seconds))
-    # thread.start()
     asyncio.create_task(controller.pulse(cleaned_colors, request.pause_time_seconds))
     return JSONResponse(content={"message": "Pulsing."})
 
@@ -62,15 +60,18 @@ async def api_solid(request: SolidRequest):
 @app.post("/api/percentage")
 async def api_circle(request: PercentageRequest):
     """Set the LED to a red-amber-green based percentage."""
-    controller.set_percentage(request.percentage, request.flashing)
+    asyncio.create_task(controller.set_percentage(request.percentage, request.flashing))
     return JSONResponse(content={"message": "Percentage started effect started."})
 
 
 def clean_and_validate_hex(hex_code: str) -> str:
-    hex_code = hex_code.lstrip('#')
+    hex_code = hex_code.lstrip("#")
     if not re.match(r"^[0-9A-Fa-f]{6}$", hex_code):
-        raise HTTPException(status_code=400, detail="Invalid hex colour code. Example: F5A9B8")
+        raise HTTPException(
+            status_code=400, detail="Invalid hex colour code. Example: F5A9B8"
+        )
     return hex_code
+
 
 if __name__ == "__main__":
     import uvicorn

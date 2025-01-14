@@ -10,7 +10,7 @@ class AppState:
     _instance = None
     status: Status
     details: dict
-    
+
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
             cls._instance = super(AppState, cls).__new__(cls)
