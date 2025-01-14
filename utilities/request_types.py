@@ -11,5 +11,5 @@ class SolidRequest(BaseModel):
 
 
 class PulseRequest(BaseModel):
-    colours: list[str] = Field(description="A list of hex codes for the colours to pulse through", examples=[["#FF00A6", "#00C8FF", "#0000FF"]])
+    colours: list[str] = Field(description="A list of hex codes for the colours to pulse through")
     pause_time_seconds: float = 1

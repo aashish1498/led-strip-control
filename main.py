@@ -53,6 +53,7 @@ async def api_clear():
 @app.post("/api/solid")
 async def api_solid(request: SolidRequest):
     """Sets the LED strip to a solid colour."""
+    controller.cancel_task()
     hex_code = clean_and_validate_hex(request.hex_code)
     controller.solid(hex_code)
     return JSONResponse(content={"message": "Solid colour set."})

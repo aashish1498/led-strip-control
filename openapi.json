@@ -202,8 +202,7 @@
                         "items": { "type": "string" },
                         "type": "array",
                         "title": "Colours",
-                        "description": "A list of hex codes for the colours to pulse through",
-                        "examples": [["#FF00A6", "#00C8FF", "#0000FF"]]
+                        "description": "A list of hex codes for the colours to pulse through"
                     },
                     "pause_time_seconds": {
                         "type": "number",
