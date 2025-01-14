@@ -30,7 +30,6 @@ class LedController:
     def cancel_task(self):
         if self.current_task is not None:
             self.current_task.cancel()
-        self.clear()
 
     def clear(self, reset_status: bool = False):
         self.status = Status.CLEARED
