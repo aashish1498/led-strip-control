@@ -30,12 +30,12 @@ class LedController:
     def cancel_task(self):
         if self.current_task is not None:
             self.current_task.cancel()
+        self.clear()
 
     def clear(self, reset_status: bool = False):
-        self.status = Status.CLEARED
         self.strip.clear_strip()
         if reset_status:
-            self.cancel_task()
+            self.status = Status.CLEARED
 
     async def run_rainbow_circle(self):
         self.status = Status.RUNNING
