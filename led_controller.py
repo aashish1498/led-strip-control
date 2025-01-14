@@ -5,6 +5,7 @@ import logging
 import asyncio
 from app_state import Status
 from utilities.led_utils import (
+    enhance_rgb_color,
     hex_to_rgb,
     rainbow_colour_from_index,
     red_amber_green_from_index,
@@ -56,9 +57,10 @@ class LedController:
 
     def solid(self, hex_code: str):
         (r, g, b) = hex_to_rgb(hex_code)
-        logging.debug(f"Setting solid color to: {r}, {g}, {b} (from hex: {hex_code})")
+        (r_mod, g_mod, b_mod) = enhance_rgb_color(r, g, b)
+        logging.debug(f"Original: {r}, {g}, {b}. Enhanced: {r_mod}, {g_mod}, {b_mod}.")
         for led in range(0, NUM_LEDS_TOTAL):
-            self.strip.set_pixel(led, r, g, b, GLOBAL_BRIGHTNESS)
+            self.strip.set_pixel(led, r_mod, g_mod, b_mod, GLOBAL_BRIGHTNESS)
         self.strip.show()
 
     async def flash_direction(self, direction: int, num_flashes: int = 1):

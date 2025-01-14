@@ -30,3 +30,11 @@ def exponential_map(
     exp_value = normalized**exponent
     mapped_value = output_min + (exp_value * (output_max - output_min))
     return int(mapped_value)
+
+def enhance_channel(value, gamma=0.8):
+    normalized = value / 255.0
+    enhanced = pow(normalized, gamma)
+    return min(max(int(enhanced * 255), 0), 255)
+
+def enhance_rgb_color(r, g, b, gamma=0.8):
+    return enhance_channel(r, gamma), enhance_channel(g, gamma), enhance_channel(b, gamma)
