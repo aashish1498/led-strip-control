@@ -18,14 +18,24 @@ sleep_step = 0.1
 class LedController:
     strip = apa102.APA102(num_led=NUM_LEDS_TOTAL, order="rgb")
     status: Status
+    current_task: asyncio.Task = None
 
     def __init__(self):
         self.status = Status.RUNNING
 
-    def clear(self):
+    def set_task(self, task: asyncio.Task):
+        self.current_task = task
+
+    def cancel_task(self):
+        if self.current_task is not None:
+            self.current_task.cancel()
+        self.clear()
+
+    def clear(self, reset_status: bool = False):
         self.strip.clear_strip()
-        self.status = Status.CLEARED
-        time.sleep(0.5)
+        if reset_status:
+            self.status = Status.CLEARED
+            self.cancel_task()
 
     async def run_rainbow_circle(self):
         self.set_circular_pixels(
@@ -72,11 +82,13 @@ class LedController:
         static_time_seconds = pause_time_seconds - fade_time_seconds
         while self.status is not Status.CLEARED:
             for i in range(len(colours)):
+                if self.status is Status.CLEARED:
+                    return
                 colour = colours[i]
                 next_colour = colours[(i + 1) % len(colours)]
                 logging.debug(f"Pulsing from {colour} to {next_colour}.")
                 await self.fade_between_colors(colour, next_colour, fade_time_seconds)
-                await asyncio.sleep(static_time_seconds)
+                await self.safe_sleep(static_time_seconds)
         self.clear()
 
     async def fade_between_colors(
@@ -99,7 +111,7 @@ class LedController:
                 self.strip.set_pixel(led, r, g, b, GLOBAL_BRIGHTNESS)
 
             self.strip.show()
-            await asyncio.sleep(step_duration)
+            await self.safe_sleep(step_duration)
 
     async def set_circular_pixels(
         self,
@@ -154,6 +166,9 @@ class LedController:
         if sleep_seconds <= sleep_step:
             await asyncio.sleep(sleep_seconds)
             return
-        for pause_time in range(0, sleep_seconds, sleep_step):
-            if self.status != Status.CLEARED:
-                await asyncio.sleep(sleep_step)
+        current_time = 0
+        while current_time < sleep_seconds:
+            if self.status is Status.CLEARED:
+                return
+            await asyncio.sleep(sleep_step)
+            current_time += sleep_step

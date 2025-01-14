@@ -1,8 +1,7 @@
 import asyncio
-import threading
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
-from app_state import AppState, Status
+from app_state import AppState
 from config import SERVICE_PORT
 import re
 from led_controller import LedController
@@ -34,18 +33,20 @@ async def api_flash(direction: int, number_of_flashes: int):
 @app.get("/api/pulse")
 async def api_pulse(request: PulseRequest):
     """Pulses the LED strip between given colours."""
-    if controller.status is not Status.CLEARED:
-        controller.clear()
+    controller.cancel_task()
     cleaned_colors = [clean_and_validate_hex(color) for color in request.colours]
-    asyncio.create_task(controller.pulse(cleaned_colors, request.pause_time_seconds))
+    controller.set_task(
+        asyncio.ensure_future(
+            controller.pulse(cleaned_colors, request.pause_time_seconds)
+        )
+    )
     return JSONResponse(content={"message": "Pulsing."})
 
 
 @app.get("/api/clear")
 async def api_clear():
     """Clears the strip."""
-    controller.status = Status.CLEARED
-    controller.clear()
+    controller.clear(True)
     return JSONResponse(content={"message": "Clearing."})
 
 
